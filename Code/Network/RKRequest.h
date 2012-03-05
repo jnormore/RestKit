@@ -346,6 +346,14 @@ typedef enum {
 - (BOOL)prepareURLRequest;
 
 /**
+ Flag to determine wheather or not we keep trailing slash on NSURL.path calls
+ By default, path strips the any trailing slash. 
+ Useful when service is using framework that is strict about keeping trailing slashes (django).
+ */
++ (void)setKeepTrailingSlash:(BOOL)keepTrailingSlash;
++ (BOOL)keepTrailingSlash;
+
+/**
  * Resets the state of an RKRequest so that it can be re-sent.
  */
 - (void)reset;

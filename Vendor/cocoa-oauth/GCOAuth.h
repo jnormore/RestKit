@@ -40,6 +40,7 @@
 @private
     NSString *signatureSecret;
     NSDictionary *OAuthParameters;
+    BOOL _keepTrailingSlash;
 }
 
 /*
@@ -71,14 +72,17 @@
                         accessToken:(NSString *)accessToken
                         tokenSecret:(NSString *)tokenSecret;
 
+
 /*
  Performs the same operation as the above method but allows a customizable URL
- scheme, e.g. HTTPS.
+ scheme, e.g. HTTPS, port, and option to keep trailing slash.
  */
-+ (NSURLRequest *)URLRequestForPath:(NSString *)path
++ (NSURLRequest *)URLRequestForPath:(NSString *)path 
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                       GETParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -99,12 +103,14 @@
 
 /*
  Performs the same operation as the above method but allows a customizable URL
- scheme, e.g. HTTPS.
+ scheme, e.g. HTTPS, port, and option to keep trailing slash.
  */
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                      POSTParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -125,12 +131,14 @@
 
 /*
  Performs the same operation as the above method but allows a customizable URL
- scheme, e.g. HTTPS.
+ scheme, e.g. HTTPS, port, and option to keep trailing slash.
  */
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                       PUTParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken

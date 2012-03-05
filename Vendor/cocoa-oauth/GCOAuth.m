@@ -78,10 +78,12 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 
 // method can be PUT, POST or DELETE. but not GET
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL)keepTrailingSlash
                           urlMethod:(NSString *)urlMethod
                          parameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -105,9 +107,11 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 - (id)initWithConsumerKey:(NSString *)consumerKey
            consumerSecret:(NSString *)consumerSecret
               accessToken:(NSString *)accessToken
-              tokenSecret:(NSString *)tokenSecret {
+              tokenSecret:(NSString *)tokenSecret 
+        keepTrailingSlash:(BOOL) keepTrailingSlash {
     self = [super init];
     if (self) {
+        _keepTrailingSlash = keepTrailingSlash;
         OAuthParameters = [[NSDictionary alloc] initWithObjectsAndKeys:
                            [[consumerKey copy] autorelease], @"oauth_consumer_key",
                            [GCOAuth nonce], @"oauth_nonce",
@@ -119,6 +123,12 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
         signatureSecret = [[NSString stringWithFormat:@"%@&%@", [consumerSecret pcen], [tokenSecret ?: @"" pcen]] retain];
     }
     return self;
+}
+- (id)initWithConsumerKey:(NSString *)consumerKey
+           consumerSecret:(NSString *)consumerSecret
+              accessToken:(NSString *)accessToken
+              tokenSecret:(NSString *)tokenSecret {
+    return [self initWithConsumerKey:consumerKey consumerSecret:consumerSecret accessToken:accessToken tokenSecret:tokenSecret keepTrailingSlash:NO];
 }
 - (NSMutableURLRequest *)request {
     NSMutableURLRequest *request = [NSMutableURLRequest
@@ -180,10 +190,12 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
     
     // construct request url
     NSURL *URL = self.URL;
-    NSString *URLString = [NSString stringWithFormat:@"%@://%@%@",
+    NSString *URLString = [NSString stringWithFormat:@"%@://%@:%@%@%@",
                            [[URL scheme] lowercaseString],
                            [[URL host] lowercaseString],
-                           [[URL path] lowercaseString]];
+                           [[URL port] stringValue],
+                           [URL path],
+                           (_keepTrailingSlash ? @"/" : @"")];
     
     // create components
     NSArray *components = [NSArray arrayWithObjects:
@@ -246,18 +258,23 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
                         accessToken:(NSString *)accessToken
                         tokenSecret:(NSString *)tokenSecret {
     return [self URLRequestForPath:path
+                 keepTrailingSlash:NO 
                      GETParameters:parameters
                             scheme:@"http"
                               host:host
+                              port:nil 
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
                        tokenSecret:tokenSecret];
 }
-+ (NSURLRequest *)URLRequestForPath:(NSString *)path
+
++ (NSURLRequest *)URLRequestForPath:(NSString *)path 
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                       GETParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -270,13 +287,19 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
     GCOAuth *oauth = [[GCOAuth alloc] initWithConsumerKey:consumerKey
                                            consumerSecret:consumerSecret
                                               accessToken:accessToken
-                                              tokenSecret:tokenSecret];
+                                              tokenSecret:tokenSecret 
+                                        keepTrailingSlash:keepTrailingSlash];
     oauth.HTTPMethod = @"GET";
     oauth.requestParameters = parameters;
     
     // create url
     NSString *encodedPath = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSString *URLString = [NSString stringWithFormat:@"%@://%@%@", scheme, host, encodedPath];
+    NSString *URLString;
+    if(port) {
+        URLString = [NSString stringWithFormat:@"%@://%@:%@%@%@", scheme, host, [port stringValue], encodedPath, (keepTrailingSlash ? @"/" : @"")];
+    } else {
+        URLString = [NSString stringWithFormat:@"%@://%@%@%@", scheme, host, encodedPath, (keepTrailingSlash ? @"/" : @"")];
+    }
     if ([oauth.requestParameters count]) {
         NSString *query = [GCOAuth queryStringFromParameters:oauth.requestParameters];
         URLString = [NSString stringWithFormat:@"%@?%@", URLString, query];
@@ -299,9 +322,11 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
                         tokenSecret:(NSString *)tokenSecret
 {
     return [self URLRequestForPath:path
+                 keepTrailingSlash:NO 
                     POSTParameters:parameters
                             scheme:@"https"
                               host:host
+                              port:nil 
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
@@ -310,19 +335,23 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 
 
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                      POSTParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
                         tokenSecret:(NSString *)tokenSecret {
     
     return [self URLRequestForPath:path
+                 keepTrailingSlash:keepTrailingSlash
                          urlMethod:@"POST"
                         parameters:parameters
                             scheme:scheme
                               host:host
+                              port:port
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
@@ -339,9 +368,11 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
                         tokenSecret:(NSString *)tokenSecret {
     
     return [self URLRequestForPath:path
+                keepTrailingSlash:NO
                      PUTParameters:parameters
                             scheme:@"HTTPS"
                               host:host
+                              port:nil
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
@@ -349,9 +380,11 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 }
 
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash
                       PUTParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -359,10 +392,12 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
     
     
     return [self URLRequestForPath:path
+                 keepTrailingSlash:keepTrailingSlash
                          urlMethod:@"PUT"
                         parameters:parameters
                             scheme:scheme
                               host:host
+                              port:port
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
@@ -371,10 +406,12 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 
 
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
                           urlMethod:(NSString *)urlMethod
                          parameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
+                               port:(NSNumber *)port 
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
@@ -387,12 +424,17 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
     GCOAuth *oauth = [[GCOAuth alloc] initWithConsumerKey:consumerKey
                                            consumerSecret:consumerSecret
                                               accessToken:accessToken
-                                              tokenSecret:tokenSecret];
+                                              tokenSecret:tokenSecret 
+                                              keepTrailingSlash:keepTrailingSlash];
     oauth.HTTPMethod = urlMethod;
     oauth.requestParameters = parameters;
-    NSURL *URL = [[NSURL alloc] initWithScheme:scheme host:host path:path];
-    oauth.URL = URL;
-    [URL release];
+    NSString *URLString;
+    if(port) {
+        URLString = [NSString stringWithFormat:@"%@://%@:%@%@%@", scheme, host, [port stringValue], path, (keepTrailingSlash ? @"/" : @"")];
+    } else {
+        URLString = [NSString stringWithFormat:@"%@://%@%@%@", scheme, host, path, (keepTrailingSlash ? @"/" : @"")];
+    }
+    oauth.URL = [NSURL URLWithString:URLString];
     
     // create request
     NSMutableURLRequest *request = [oauth request];

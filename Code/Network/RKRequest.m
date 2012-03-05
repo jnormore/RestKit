@@ -109,6 +109,14 @@
     return self;
 }
 
+static BOOL _keepTrailingSlash = NO;
++ (void)setKeepTrailingSlash:(BOOL)keepTrailingSlash {
+    _keepTrailingSlash = keepTrailingSlash;
+}
++ (BOOL)keepTrailingSlash {
+    return _keepTrailingSlash;
+}
+
 - (void)reset {
     if (_isLoading) {
         RKLogWarning(@"Request was reset while loading: %@. Canceling.", self);
@@ -264,27 +272,33 @@
             
         if (self.method == RKRequestMethodPUT)
             echo = [GCOAuth URLRequestForPath:[_URL path]
+                            keepTrailingSlash:[RKRequest keepTrailingSlash]
                                 PUTParameters:parameters
                                        scheme:[_URL scheme]
                                          host:[_URL host]
+                                         port:[_URL port] 
                                   consumerKey:self.OAuth1ConsumerKey
                                consumerSecret:self.OAuth1ConsumerSecret
                                   accessToken:self.OAuth1AccessToken
                                   tokenSecret:self.OAuth1AccessTokenSecret];
         else if (self.method == RKRequestMethodPOST)
             echo = [GCOAuth URLRequestForPath:[_URL path]
+                            keepTrailingSlash:[RKRequest keepTrailingSlash]
                                POSTParameters:parameters
                                        scheme:[_URL scheme]
                                          host:[_URL host]
+                                         port:[_URL port] 
                                   consumerKey:self.OAuth1ConsumerKey
                                consumerSecret:self.OAuth1ConsumerSecret
                                   accessToken:self.OAuth1AccessToken
                                   tokenSecret:self.OAuth1AccessTokenSecret];
         else
             echo = [GCOAuth URLRequestForPath:[_URL path]
+                            keepTrailingSlash:[RKRequest keepTrailingSlash] 
                                 GETParameters:[_URL queryDictionary]
                                        scheme:[_URL scheme]
                                          host:[_URL host]
+                                         port:[_URL port] 
                                   consumerKey:self.OAuth1ConsumerKey
                                consumerSecret:self.OAuth1ConsumerSecret
                                   accessToken:self.OAuth1AccessToken
