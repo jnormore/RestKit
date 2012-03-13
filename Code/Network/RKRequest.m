@@ -281,6 +281,17 @@ static BOOL _keepTrailingSlash = NO;
                                consumerSecret:self.OAuth1ConsumerSecret
                                   accessToken:self.OAuth1AccessToken
                                   tokenSecret:self.OAuth1AccessTokenSecret];
+        else if (self.method == RKRequestMethodDELETE)
+            echo = [GCOAuth URLRequestForPath:[_URL path]
+                            keepTrailingSlash:[RKRequest keepTrailingSlash]
+                               DELETEParameters:parameters
+                                       scheme:[_URL scheme]
+                                         host:[_URL host]
+                                         port:[_URL port] 
+                                  consumerKey:self.OAuth1ConsumerKey
+                               consumerSecret:self.OAuth1ConsumerSecret
+                                  accessToken:self.OAuth1AccessToken
+                                  tokenSecret:self.OAuth1AccessTokenSecret];
         else if (self.method == RKRequestMethodPOST)
             echo = [GCOAuth URLRequestForPath:[_URL path]
                             keepTrailingSlash:[RKRequest keepTrailingSlash]

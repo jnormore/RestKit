@@ -75,7 +75,7 @@
 
 /*
  Performs the same operation as the above method but allows a customizable URL
- scheme, e.g. HTTPS, port, and option to keep trailing slash.
+ scheme, port, and option to keep trailing slash.
  */
 + (NSURLRequest *)URLRequestForPath:(NSString *)path 
                   keepTrailingSlash:(BOOL) keepTrailingSlash 
@@ -103,11 +103,39 @@
 
 /*
  Performs the same operation as the above method but allows a customizable URL
- scheme, e.g. HTTPS, port, and option to keep trailing slash.
+ scheme, port, and option to keep trailing slash.
  */
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
                   keepTrailingSlash:(BOOL) keepTrailingSlash 
                      POSTParameters:(NSDictionary *)parameters
+                             scheme:(NSString *)scheme
+                               host:(NSString *)host
+                               port:(NSNumber *)port 
+                        consumerKey:(NSString *)consumerKey
+                     consumerSecret:(NSString *)consumerSecret
+                        accessToken:(NSString *)accessToken
+                        tokenSecret:(NSString *)tokenSecret;
+
+/*
+ Creates and returns a URL request that will perform a DELETE HTTPS operation. All
+ data will be sent as form URL encoded. Restrictions on the arguments to this
+ method are the same as the GET request methods.
+ */
++ (NSURLRequest *)URLRequestForPath:(NSString *)path
+                     DELETEParameters:(NSDictionary *)parameters
+                               host:(NSString *)host
+                        consumerKey:(NSString *)consumerKey
+                     consumerSecret:(NSString *)consumerSecret
+                        accessToken:(NSString *)accessToken
+                        tokenSecret:(NSString *)tokenSecret;
+
+/*
+ Performs the same operation as the above method but allows a customizable URL
+ scheme, port, and option to keep trailing slash.
+ */
++ (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
+                     DELETEParameters:(NSDictionary *)parameters
                              scheme:(NSString *)scheme
                                host:(NSString *)host
                                port:(NSNumber *)port 

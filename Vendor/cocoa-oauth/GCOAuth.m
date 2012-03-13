@@ -360,6 +360,51 @@ static BOOL GCOAuthUseHTTPSCookieStorage = YES;
 }
 
 + (NSURLRequest *)URLRequestForPath:(NSString *)path
+                     DELETEParameters:(NSDictionary *)parameters
+                               host:(NSString *)host
+                        consumerKey:(NSString *)consumerKey
+                     consumerSecret:(NSString *)consumerSecret
+                        accessToken:(NSString *)accessToken
+                        tokenSecret:(NSString *)tokenSecret
+{
+    return [self URLRequestForPath:path
+                 keepTrailingSlash:NO 
+                    DELETEParameters:parameters
+                            scheme:@"https"
+                              host:host
+                              port:nil 
+                       consumerKey:consumerKey
+                    consumerSecret:consumerSecret
+                       accessToken:accessToken
+                       tokenSecret:tokenSecret];
+}
+
++ (NSURLRequest *)URLRequestForPath:(NSString *)path
+                  keepTrailingSlash:(BOOL) keepTrailingSlash 
+                     DELETEParameters:(NSDictionary *)parameters
+                             scheme:(NSString *)scheme
+                               host:(NSString *)host
+                               port:(NSNumber *)port 
+                        consumerKey:(NSString *)consumerKey
+                     consumerSecret:(NSString *)consumerSecret
+                        accessToken:(NSString *)accessToken
+                        tokenSecret:(NSString *)tokenSecret {
+    
+    return [self URLRequestForPath:path
+                 keepTrailingSlash:keepTrailingSlash
+                         urlMethod:@"DELETE"
+                        parameters:parameters
+                            scheme:scheme
+                              host:host
+                              port:port
+                       consumerKey:consumerKey
+                    consumerSecret:consumerSecret
+                       accessToken:accessToken
+                       tokenSecret:tokenSecret];
+    
+}
+
++ (NSURLRequest *)URLRequestForPath:(NSString *)path
                       PUTParameters:(NSDictionary *)parameters
                                host:(NSString *)host
                         consumerKey:(NSString *)consumerKey
